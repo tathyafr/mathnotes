@@ -6,47 +6,15 @@ function convertToKaTeX(input) {
 
 function renderEquationLive() {
   const mathField = document.getElementById("mathInput");
-  const rawInput = mathField.getValue("ascii-math");
+  const latex = mathField.getValue("latex");  // <- this is the fix
   const output = document.getElementById("output");
 
-  const formatted = convertToKaTeX(rawInput);
-
   try {
-    katex.render(formatted, output, { throwOnError: false });
+    katex.render(latex, output, {
+      throwOnError: false
+    });
   } catch (err) {
     output.innerText = "Invalid equation!";
-  }
-}
-
-function evaluateExpression() {
-  const input = document.getElementById("mathInput").getValue("ascii-math");
-  const resultDiv = document.getElementById("result");
-
-  try {
-    let cleaned = input
-      .replace(/\s+/g, '')                     // remove spaces
-      .replace(/\^/g, '**')                    // x^2 → x**2
-      .replace(/([0-9])([a-zA-Z])/g, '$1*$2'); // 2x → 2*x
-
-    let result;
-
-    if (cleaned.includes('=')) {
-      // Split and turn into symbolic math
-      const [lhs, rhs] = cleaned.split('=');
-      const equation = math.parse(lhs + ' - (' + rhs + ')');
-      const simplified = math.simplify(equation);
-
-      // Solve for x
-      result = math.solve(simplified, 'x');
-      resultDiv.innerText = `Solution: ${result.toString()}`;
-    } else {
-      // Basic calculation
-      result = math.evaluate(cleaned);
-      resultDiv.innerText = `Result: ${result}`;
-    }
-  } catch (err) {
-    resultDiv.innerText = "⚠️ Invalid or unsupported expression.";
-    console.error("Math.js Error:", err.message);
   }
 }
 
@@ -65,3 +33,34 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+async function solveWithSymPy() {
+  const mathField = document.getElementById("mathInput");
+  let equation = mathField.getValue("ascii-math");  // raw input
+  const resultDiv = document.getElementById("sympy-result");
+
+  // 🔧 Fix: Add explicit multiplication (2x → 2*x)
+  equation = equation.replace(/\s+/g, '');                    // remove spaces
+  equation = equation.replace(/([0-9])([a-zA-Z])/g, '$1*$2'); // 2x → 2*x
+
+  try {
+    const res = await fetch("http://127.0.0.1:5000/solve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ equation: equation, variable: 'x' })
+    });
+
+    const data = await res.json();
+
+    if (data.solution) {
+      resultDiv.innerText = `SymPy Solution: ${data.solution.join(', ')}`;
+    } else if (data.error) {
+      resultDiv.innerText = `Error: ${data.error}`;
+    }
+  } catch (err) {
+    resultDiv.innerText = "⚠️ Could not connect to SymPy server.";
+    console.error(err);
+  }
+}
