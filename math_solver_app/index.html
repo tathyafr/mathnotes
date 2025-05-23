@@ -15,28 +15,41 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
 
-  <button onclick="solveWithSymPy()">Solve with SymPy</button>
-  <div id="sympy-result" style="margin-top: 10px; font-size: 18px;"></div>
+
 
 
 
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <h1>Math Solver (Math.js)</h1>
+  <div class="card">
+  <h1>Visual Math Solver</h1>
 
   <math-field id="mathInput" virtual-keyboard-mode="manual"></math-field>
-  <br><br>
 
-  <button onclick="evaluateExpression()">Calculate</button>
+  <div class="controls">
+    <label for="mode">Mode:</label>
+    <select id="mode">
+      <option value="solve">Solve</option>
+      <option value="simplify">Simplify</option>
+      <option value="expand">Expand</option>
+      <option value="factor">Factor</option>
+      <option value="substitute">Substitute</option>
+    </select>
 
-  <h2>Rendered Equation:</h2>
-  <div id="output" style="margin-top: 10px; font-size: 20px;"></div>
+    <input id="subs" placeholder="Substitutions (e.g. x=2, y=3)">
+    <button onclick="runSelectedMode()">Solve</button>
+  </div>
 
-  <h2>Result:</h2>
-  <div id="result" style="margin-top: 10px; font-size: 18px;"></div>
+  <div id="sympy-result"></div>
+  <div id="sympy-katex"></div>
 
+  <h2>Rendered Input:</h2>
+  <div id="output"></div>
+  </div>
+
+  <!-- link to JS file -->
   <script src="script.js"></script>
+
 </body>
 </html>
