@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from sympy import symbols, Eq, solve, sympify
+from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # ✅ This enables cross-origin requests from your frontend
+CORS(app)
 
 @app.route("/solve", methods=["POST"])
 def solve_equation():
@@ -23,8 +23,8 @@ def solve_equation():
                 lhs_expr = lhs_expr.subs(subs_dict)
                 rhs_expr = rhs_expr.subs(subs_dict)
 
-            eq = Eq(lhs_expr, rhs_expr)
-            result = solve(eq, symbols(variable))
+            expr = Eq(lhs_expr, rhs_expr)
+            result = solve(expr, symbols(variable))
         else:
             expr = sympify(expr_str)
             if substitutions:
@@ -56,6 +56,35 @@ def transform_expression():
         return jsonify({"result": str(result)})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+    
+
+@app.route("/suggest", methods=["POST"])
+def suggest_step():
+    data = request.json
+    expr_str = data.get("equation", "")
+
+    try:
+        if "=" in expr_str:
+            lhs, rhs = expr_str.split("=")
+            lhs_expr = sympify(lhs)
+            rhs_expr = sympify(rhs)
+
+            diff = lhs_expr - rhs_expr
+            symbols_in_expr = list(diff.free_symbols)
+
+            if len(symbols_in_expr) == 1:
+                var = symbols_in_expr[0]
+                terms = diff.as_ordered_terms()
+
+                if len(terms) >= 2:
+                    return jsonify({"suggestion": f"Move all terms involving {var} to one side"})
+
+            return jsonify({"suggestion": "Isolate the variable or simplify both sides"})
+        else:
+            return jsonify({"suggestion": "No equation to solve"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
 
 if __name__ == "__main__":
     print("Starting Flask app...")

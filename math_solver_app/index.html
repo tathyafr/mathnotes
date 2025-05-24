@@ -1,55 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Math.js Solver</title>
-
-  <!-- Math.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.js"></script>
+  <meta charset="UTF-8" />
+  <title>Math Solver + Notes</title>
 
   <!-- MathLive -->
-  <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive.core.css">
+  <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive.core.css" />
   <script defer src="https://unpkg.com/mathlive"></script>
 
   <!-- KaTeX -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
 
-
-
-
-
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="card">
-  <h1>Visual Math Solver</h1>
+    <h1>Visual Math Solver</h1>
 
-  <math-field id="mathInput" virtual-keyboard-mode="manual"></math-field>
+    <math-field id="mathInput" virtual-keyboard-mode="manual"></math-field>
 
-  <div class="controls">
-    <label for="mode">Mode:</label>
-    <select id="mode">
-      <option value="solve">Solve</option>
-      <option value="simplify">Simplify</option>
-      <option value="expand">Expand</option>
-      <option value="factor">Factor</option>
-      <option value="substitute">Substitute</option>
-    </select>
+    <div class="controls">
+      <label for="mode">Mode:</label>
+      <select id="mode">
+        <option value="solve">Solve</option>
+        <option value="simplify">Simplify</option>
+        <option value="expand">Expand</option>
+        <option value="factor">Factor</option>
+      </select>
 
-    <input id="subs" placeholder="Substitutions (e.g. x=2, y=3)">
-    <button onclick="runSelectedMode()">Solve</button>
+      <math-field
+        id="subs"
+        virtual-keyboard-mode="manual"
+        style="width: 240px; font-size: 16px; color: #888;"
+        placeholder="e.g. x=2, y=3">
+      </math-field>
+
+      <button onclick="runSelectedMode()">Solve</button>
+      <button onclick="insertMathNote()">Insert into Notes</button>
+    </div>
+
+    <div id="sympy-katex"></div>
+
+    <h2>Steps:</h2>
+    <ol id="steps" class="step-log"></ol>
+
+    <h2>Notebook</h2>
+    <div id="notebook" contenteditable="true" class="note-box"></div>
+    <button onclick="suggestNextStep()" style="margin-top: 10px;">💡 Suggest Next Step</button>
   </div>
 
-  <div id="sympy-result"></div>
-  <div id="sympy-katex"></div>
-
-  <h2>Rendered Input:</h2>
-  <div id="output"></div>
-  </div>
-
-  <!-- link to JS file -->
   <script src="script.js"></script>
-
 </body>
 </html>
